@@ -13,6 +13,6 @@ router.post("/login", userController.login);
 router.get("/:id", userController.getUserById);
 router.post("/addtocart", userController.addProductToCart);
 router.delete("/removecartitem", userController.removeProductFromCart);
-router.patch("/updateAdmin", userController.updateIsAdmin);
+router.patch("/updateAdmin/:id", userController.updateIsAdmin);
 
 export default router;
