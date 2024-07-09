@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      unique: true,
     },
     name: {
       type: String,
@@ -15,6 +16,12 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+    },
+    phone: {
+      type: String,
+    },
+    address: {
+      type: String,
     },
     code: {
       type: String,
@@ -40,6 +47,12 @@ const userSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+        size: {
+          type: String,
+        },
+        color: {
+          type: String,
+        },
       },
     ],
     role: {
@@ -47,10 +60,30 @@ const userSchema = new mongoose.Schema(
       ref: "Role",
       required: true,
     },
+    level: {
+      type: String,
+      enum: ["agency", "client"],
+      default: "client",
+    },
+    aboutCode: {
+      type: String,
+    },
+    commission: {
+      type: Number,
+    },
   },
   {
     timestamps: true,
   }
 );
+userSchema.pre("save", async function (next) {
+  if (this.isModified("role") || this.isNew) {
+    const roleData = await mongoose.model("Role").findById(this.role).exec();
+    if (roleData && this.commission === undefined) {
+      this.commission = roleData.commission;
+    }
+  }
+  next();
+});
 
 export default mongoose.model("User", userSchema);

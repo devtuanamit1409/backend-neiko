@@ -5,27 +5,18 @@ const productSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      trim: true,
     },
-    price: {
-      type: Number,
-      required: true,
-    },
-    wholesaleprice: {
-      type: Number,
-      required: true,
-    },
-    images: [String],
+    image: String,
     sizeInfo: [
       {
-        size: Number,
-        price: Number,
+        size: String, // Đổi thành String nếu size có thể bao gồm không chỉ số
+        retailPrice: Number, // Giá bán lẻ
+        wholesalePrice: Number, // Giá bán buôn
       },
     ],
     colorInfo: [
       {
         color: String,
-        price: Number,
       },
     ],
     description: {

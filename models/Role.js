@@ -6,11 +6,7 @@ const roleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    maincommission: {
-      type: Number,
-      required: true,
-    },
-    subcommission: {
+    commission: {
       type: Number,
       required: true,
     },
