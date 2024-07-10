@@ -53,9 +53,12 @@ const orderController = {
         if (!sizeDetail) continue;
 
         const price =
-          user.level === "agency"
+          user.level === "client"
+            ? sizeDetail.retailPrice
+            : user.level === "agency"
             ? sizeDetail.wholesalePrice
-            : sizeDetail.retailPrice;
+            : sizeDetail.defaultPrice;
+
         totalPrice += price * item.qty;
         messageDetails.push(
           `📦 ${product.name} - Mã: ${item.size}, Số lượng: ${
