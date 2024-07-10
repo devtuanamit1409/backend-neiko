@@ -78,7 +78,7 @@ const userController = {
 
   updateUser: async (req, res) => {
     const { id } = req.params;
-    const { level, commission } = req.body;
+    const { level, commission, balance } = req.body;
 
     try {
       const user = await User.findById(id);
