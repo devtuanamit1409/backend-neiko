@@ -50,7 +50,7 @@ const orderController = {
         const colorDetail = product.colorInfo.find(
           (ci) => ci.color === item.color
         );
-        if (!sizeDetail || !colorDetail) continue;
+        if (!sizeDetail) continue;
 
         const price =
           user.level === "agency"
@@ -58,11 +58,11 @@ const orderController = {
             : sizeDetail.retailPrice;
         totalPrice += price * item.qty;
         messageDetails.push(
-          `📦 ${product.name} - Kích thước: ${item.size}, Màu: ${
-            item.color
-          }, Số lượng: ${item.qty}, Đơn giá: ${price.toLocaleString(
-            "vi-VN"
-          )}₫, Tổng: ${(price * item.qty).toLocaleString("vi-VN")}₫`
+          `📦 ${product.name} - Mã: ${item.size}, Số lượng: ${
+            item.qty
+          }, Đơn giá: ${price.toLocaleString("vi-VN")}₫, Tổng: ${(
+            price * item.qty
+          ).toLocaleString("vi-VN")}₫`
         );
       }
 

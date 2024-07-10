@@ -213,7 +213,7 @@ const userController = {
   addProductToCart: async (req, res) => {
     const { userId, productId, quantity, size, color } = req.body;
 
-    if (!userId || !productId || !quantity || !size || !color) {
+    if (!userId || !productId || !quantity || !size) {
       return res.status(400).json({
         message: "Vui lòng cung cấp đầy đủ thông tin bắt buộc.",
       });

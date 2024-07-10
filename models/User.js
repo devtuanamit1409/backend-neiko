@@ -62,8 +62,8 @@ const userSchema = new mongoose.Schema(
     },
     level: {
       type: String,
-      enum: ["agency", "client"],
-      default: "client",
+      enum: ["agency", "client", "default"],
+      default: "default",
     },
     aboutCode: {
       type: String,
