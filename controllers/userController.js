@@ -91,6 +91,7 @@ const userController = {
         {
           level,
           commission,
+          balance,
         },
         { new: true }
       );
