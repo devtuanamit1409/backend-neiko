@@ -15,16 +15,8 @@ const generateRandomCode = () => {
 
 const userController = {
   createUser: async (req, res) => {
-    const {
-      username,
-      name,
-      password,
-      aboutCode,
-      commission,
-      phone,
-      address,
-      level,
-    } = req.body;
+    const { username, name, password, aboutCode, commission, phone, address } =
+      req.body;
 
     if (!username || !name || !password) {
       return res
@@ -63,7 +55,6 @@ const userController = {
         commission,
         phone,
         address,
-        level,
       });
 
       await newUser.save();
