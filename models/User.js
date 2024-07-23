@@ -71,6 +71,10 @@ const userSchema = new mongoose.Schema(
     commission: {
       type: Number,
     },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

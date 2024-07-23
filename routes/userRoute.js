@@ -5,6 +5,10 @@ const router = express.Router();
 
 router.post("/create", userController.createUser);
 router.delete("/removecartitem", userController.removeProductFromCart);
+router.get("/search", userController.searchUserByPhone);
+router.put("/active-user/:userId", userController.activeUser);
+router.put("/active-all", userController.activateAllUsers);
+router.get("/get-referred-users/:userId", userController.getReferredUsers);
 router.put("/reset-balance/:id", userController.resetBalance);
 router.get("/with-balance", userController.getUserBalances);
 router.put("/:id", userController.updateUser);

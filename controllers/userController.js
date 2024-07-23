@@ -36,7 +36,7 @@ const userController = {
         const aboutCodeExists = await User.findOne({ code: aboutCode });
         if (!aboutCodeExists) {
           return res.status(400).json({
-            message: "aboutCode không khớp với bất kỳ người dùng nào.",
+            message: "Mã làm việc không chính xác.",
           });
         }
       }
@@ -131,14 +131,14 @@ const userController = {
     const { page = 1, limit = 10 } = req.query;
 
     try {
-      const users = await User.find()
+      const users = await User.find({ isAdmin: { $ne: true } })
         .populate("role")
         .populate("cart.product")
         .limit(limit * 1)
         .skip((page - 1) * limit)
         .exec();
 
-      const count = await User.countDocuments();
+      const count = await User.countDocuments({ isAdmin: { $ne: true } });
 
       res.status(200).json({
         users,
@@ -187,6 +187,12 @@ const userController = {
         return res
           .status(400)
           .json({ message: "Tên tài khoản hoặc mật khẩu không chính xác." });
+      }
+
+      if (!user.isActive) {
+        return res
+          .status(403)
+          .json({ message: "Tài khoản của bạn chưa được kích hoạt." });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
@@ -347,6 +353,107 @@ const userController = {
       res
         .status(200)
         .json({ message: "User đã được cập nhật", user: updatedUser });
+    } catch (error) {
+      res.status(500).json({ message: "Đã xảy ra lỗi", error: error.message });
+    }
+  },
+  activeUser: async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "Người dùng không tồn tại." });
+      }
+
+      user.isActive = true;
+      await user.save();
+
+      res
+        .status(200)
+        .json({ message: "Tài khoản đã được kích hoạt thành công.", user });
+    } catch (error) {
+      res.status(500).json({ message: "Đã xảy ra lỗi", error: error.message });
+    }
+  },
+  getReferredUsers: async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "Người dùng không tồn tại." });
+      }
+
+      const referredUsers = await User.find({ aboutCode: user.code }).sort({
+        createdAt: -1,
+      });
+
+      const referredUsersWithOrders = await Promise.all(
+        referredUsers.map(async (referredUser) => {
+          const orders = await Order.find({ user: referredUser._id }).populate(
+            "orderItems.product"
+          );
+          return { ...referredUser.toObject(), orders };
+        })
+      );
+
+      res.status(200).json({
+        message: "Danh sách khách giới thiệu",
+        referredUsers: referredUsersWithOrders,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Đã xảy ra lỗi", error: error.message });
+    }
+  },
+  searchUserByPhone: async (req, res) => {
+    const { phone } = req.query;
+
+    if (!phone) {
+      return res
+        .status(400)
+        .json({ message: "Vui lòng cung cấp số điện thoại." });
+    }
+
+    try {
+      const user = await User.find({ phone })
+        .populate("role")
+        .populate("cart.product");
+
+      if (!user) {
+        return res.status(404).json({
+          message: "Không tìm thấy người dùng với số điện thoại này.",
+        });
+      }
+
+      res.status(200).json({ user });
+    } catch (error) {
+      res.status(500).json({ message: "Đã xảy ra lỗi", error: error.message });
+    }
+  },
+
+  activateAllUsers: async (req, res) => {
+    try {
+      const result = await User.updateMany(
+        { isActive: false }, // Điều kiện để tìm người dùng chưa kích hoạt
+        { $set: { isActive: true } } // Cập nhật trạng thái isActive thành true
+      );
+      console.log(result);
+
+      if (result.matchedCount === 0) {
+        return res
+          .status(404)
+          .json({ message: "Không có người dùng nào cần kích hoạt." });
+      }
+
+      res.status(200).json({
+        message:
+          "Tất cả tài khoản chưa kích hoạt đã được kích hoạt thành công.",
+        matchedCount: result.matchedCount,
+        modifiedCount: result.modifiedCount,
+      });
     } catch (error) {
       res.status(500).json({ message: "Đã xảy ra lỗi", error: error.message });
     }
